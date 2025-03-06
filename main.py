@@ -15,6 +15,6 @@ with st.form(key='my_form'):
 if submit_button:
     player_df = scrape_player_stats(url=link)
     st.dataframe(player_df)
-    st.write(f"Link dodany: {link}")
+    st.write(f"Statystyk dla gracza: {link} zostaly dodane.")
 
 
