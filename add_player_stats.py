@@ -72,3 +72,28 @@ def scrape_player_stats(url):
     df = df.loc[:, ~df.columns.duplicated()]
 
     return df  # Zwróć DataFrame
+
+def scrape_player_name(url):
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        print("Pobrano stronę pomyślnie")
+    else:
+        print(f"Błąd: {response.status_code}")
+        return None  # Zwróć None w przypadku błędu
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # Znajdź element h1, który zawiera imię i nazwisko gracza
+    player_name_element = soup.find('h1')
+    
+    if player_name_element:
+        player_name = player_name_element.text.strip()
+        # Zmiana: Zwróć tylko część przed datą
+        player_name = player_name.split(' ')[0:3]  # Zakładając, że imię i nazwisko mają 2-3 słowa
+        player_name = ' '.join(player_name)  # Połącz z powrotem w jeden ciąg
+        print(f"Imię i nazwisko gracza: {player_name}")
+        return player_name
+    else:
+        print("Nie znaleziono imienia i nazwiska gracza")
+        return None  # Zwróć None, jeśli imię i nazwisko nie zostały znalezione

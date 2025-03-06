@@ -1,10 +1,14 @@
 import pandas as pd
 import streamlit as st
 import re
-from add_player_stats import scrape_player_stats
+from add_player_stats import scrape_player_stats, scrape_player_name
 
 # Regex do walidacji URL
 url_regex = r'^https:\/\/www\.basketball-reference\.com\/players\/.*$'
+
+
+ 
+
 
 # Tytuł aplikacji
 st.title("NBA Player Score Predicter")
@@ -22,6 +26,6 @@ if submit_button:
         st.success("URL jest poprawny.")
         player_df = scrape_player_stats(url=link)
         st.dataframe(player_df)
-        st.write(f"Statystyk dla gracza: {link} zostaly dodane.")
+        st.write(f"Statystyk dla gracza: {scrape_player_name(link)} zostaly dodane.")
        
 
