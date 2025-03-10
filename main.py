@@ -19,6 +19,15 @@ BUCKET_NAME = 'nbapredicter'
 
 def start_boto3_session():
     s3 = boto3.client('s3')
+    return s3
+
+def upload_file_to_digital_ocean(file_name, bucket_name, object_name):
+    s3 = start_boto3_session()  # Uzyskujemy klienta S3
+    try:
+        s3.upload_file(file_name, bucket_name, object_name)  # Przesyłamy plik
+        st.success(f"Plik {file_name} został pomyślnie przesłany do {bucket_name}.")
+    except Exception as e:
+        st.error(f"Wystąpił błąd podczas przesyłania pliku: {e}")
 
 
 # Tytuł aplikacji
@@ -60,7 +69,16 @@ if submit_button:
 if 'player_data' in st.session_state:
     print(len(st.session_state['player_data']))
 
-if st.button("Zapisz w digital_ocean"):
-    start_boto3_session()
-    
+uploaded_file = st.file_uploader("Wybierz plik CSV do przesłania", type=["csv"])
+   
 
+if st.button("Zapisz w digital_ocean"):
+    if uploaded_file is not None:
+        # Zapisz plik tymczasowo
+        temp_file_path = os.path.join('local_storage', uploaded_file.name)
+        with open(temp_file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        
+        upload_file_to_digital_ocean(temp_file_path, BUCKET_NAME, uploaded_file.name)  # Wywołanie funkcji przesyłającej
+    else:
+        st.error("Proszę wybrać plik CSV do przesłania.")
