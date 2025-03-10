@@ -1,31 +1,66 @@
 import pandas as pd
+from dotenv import load_dotenv
+import os
+import boto3
 import streamlit as st
 import re
 from add_player_stats import scrape_player_stats, scrape_player_name
 
 # Regex do walidacji URL
 url_regex = r'^https:\/\/www\.basketball-reference\.com\/players\/.*$'
+BUCKET_NAME = 'nbapredicter'
+
+ #TODO: trzeba dodac do session state  klucz imie df to value
+ #TODO: Przetestowac na wiekszej ilosci graczy
+ #TODO: Potem trzeba oczyscic dane 
+ #TODO: Boto3 instalacja i klucze API
+ #TODO: .env creation
 
 
- 
+def start_boto3_session():
+    s3 = boto3.client('s3')
 
 
 # Tytuł aplikacji
 st.title("NBA Player Score Predicter")
+load_dotenv()
+
 
 # Tworzenie formularza
 with st.form(key='my_form'):
-    link = st.text_input("Podaj link ze strony www.basketball-reference.com")
+    link = st.text_input("Podaj link ze strony www.basketball-reference.com z sekcji gamelog dla wybranego gracza")
     submit_button = st.form_submit_button("Sprawdź URL")
 
-# Walidacja URL po naciśnięciu przycisku
+
 if submit_button:
     if link and not re.match(url_regex, link):
         st.error("Nieprawidłowy URL. Proszę podać poprawny link.")
     else:
         st.success("URL jest poprawny.")
         player_df = scrape_player_stats(url=link)
+        player_name = scrape_player_name(link)
+
+        if 'player_data' not in st.session_state:
+            st.session_state['player_data'] = []
+
+        st.session_state['player_data'].append({
+            'name': player_name,
+            'data': player_df
+        })
+
         st.dataframe(player_df)
-        st.write(f"Statystyk dla gracza: {scrape_player_name(link)} zostaly dodane.")
+        st.write(f"Statystyk dla gracza: {player_name} zostaly dodane.")
+
+        player_df.to_csv(os.path.join('local_storage', f'{player_name}.csv'), index=False)
+
+
        
+#For debugging purpose
+
+if 'player_data' in st.session_state:
+    print(len(st.session_state['player_data']))
+
+if st.button("Zapisz w digital_ocean"):
+    start_boto3_session()
+    
 

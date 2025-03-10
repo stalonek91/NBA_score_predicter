@@ -1,2 +1,4 @@
 NB
 __pycache__/
+*.txt
+.env
