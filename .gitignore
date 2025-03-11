@@ -2,3 +2,6 @@ NB
 __pycache__/
 *.txt
 .env
+player_stats.json
+raw_page.html
+raw_page_files/
