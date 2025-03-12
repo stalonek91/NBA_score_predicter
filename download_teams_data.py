@@ -59,14 +59,16 @@ def scrape_table(url):
         return None
     
     soup = BeautifulSoup(response.text, 'html.parser')
-    table = soup.find('table', class_='table table-sm table-bordered table-striped table--statistics', id='ContentPlaceHolder1_GridView3')
+    
+    # Target the specific table by its ID
+    table = soup.find('table', id='ContentPlaceHolder1_GridView1')  # Use the ID to target the correct table
     
     if not table:
         print("Table not found on the page.")
         return None
     
     # Extract headers
-    headers = [th.text.strip().replace("Sort: ", "") for th in table.find_all('th')]
+    headers = [th.text.strip() for th in table.find_all('th')]
     
     data = []
     
