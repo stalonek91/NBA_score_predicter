@@ -5,16 +5,17 @@ import boto3
 import streamlit as st
 import re
 from add_player_stats import scrape_player_stats, scrape_player_name
+from add_player_position import scrape_player_position
+from download_teams_data import scrape_table
 
 # Regex do walidacji URL
 url_regex = r'^https:\/\/www\.basketball-reference\.com\/players\/.*$'
 BUCKET_NAME = 'nbapredicter'
 
- #TODO: trzeba dodac do session state  klucz imie df to value
+
  #TODO: Przetestowac na wiekszej ilosci graczy
  #TODO: Potem trzeba oczyscic dane 
- #TODO: Boto3 instalacja i klucze API
- #TODO: .env creation
+
 
 
 def start_boto3_session():
@@ -48,6 +49,7 @@ if submit_button:
         st.success("URL jest poprawny.")
         player_df = scrape_player_stats(url=link)
         player_name = scrape_player_name(link)
+        player_position = scrape_player_position(link)
 
         if 'player_data' not in st.session_state:
             st.session_state['player_data'] = []
@@ -58,7 +60,7 @@ if submit_button:
         })
 
         st.dataframe(player_df)
-        st.write(f"Statystyk dla gracza: {player_name} zostaly dodane.")
+        st.write(f"Statystyk dla gracza: {player_name}: {player_position} zostaly dodane.")
 
         player_df.to_csv(os.path.join('local_storage', f'{player_name}.csv'), index=False)
 
@@ -82,3 +84,16 @@ if st.button("Zapisz w digital_ocean"):
         upload_file_to_digital_ocean(temp_file_path, BUCKET_NAME, uploaded_file.name)  # Wywołanie funkcji przesyłającej
     else:
         st.error("Proszę wybrać plik CSV do przesłania.")
+
+# Nowa forma do wywołania funkcji scrape_table
+with st.form(key='scrape_form'):
+    submit_scrape_button = st.form_submit_button("Scrape Table")
+
+if submit_scrape_button:
+    # Wywołanie funkcji scrape_table tylko po naciśnięciu przycisku
+    # scrape_table()  # Wywołanie funkcji scrape_table
+    print(f"SUBMIT KURWA")
+    st.success("Funkcja scrape_table została wywołana.")
+    
+    # Nowe wywołanie upload_file_to_digital_ocean
+    upload_file_to_digital_ocean('team_stats.json', BUCKET_NAME, 'team_stats.json')  # Przesyłanie pliku JSON

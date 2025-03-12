@@ -7,50 +7,8 @@ import pandas as pd
 import requests
 import json
 
-def scrape_player_stats(url):
-    # Ustawienia Selenium
-    options = Options()
-    options.headless = True  # Uruchom w trybie bezgłowym
-    service = Service('/opt/homebrew/bin/chromedriver')  # Podaj ścieżkę do chromedriver
-    driver = webdriver.Chrome(service=service, options=options)
 
-    driver.get(url)
-
-    # Pobierz HTML
-    html = driver.page_source
-    soup = BeautifulSoup(html, 'html.parser')
-
-    # Znajdź tabelę
-    table = soup.find('table', class_='table table-sm table-bordered table-striped table--statistics')
-
-    if table is None:
-        print("Nie znaleziono tabeli z danymi")
-        print("Sprawdzany URL:", url)  # Dodano logowanie URL
-        print("HTML strony:", html)  # Dodano logowanie HTML
-        driver.quit()
-        return None  # Zwróć None, jeśli tabela nie została znaleziona
-
-    print(f"Znaleziono tabelę")
-
-
-    headers = [th.text.strip() for th in table.find_all('span')]  # Zmiana na wyszukiwanie span
-    if not headers:
-        print("Nie znaleziono nagłówków tabeli.")
-        driver.quit()
-        return None  # Zwróć None, jeśli nagłówki nie zostały znalezione
-
-    rows = []
-    tbody = table.find('tbody')
-
-    for row in tbody.find_all('tr'):
-        cols = row.find_all('td')
-        values = [col.text.strip() for col in cols]
-        rows.append(values)
-
-    driver.quit()  # Zamknij przeglądarkę
-    return headers, rows  # Zwróć nagłówki i wiersze
-
-def scrape_table(url):
+def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -91,22 +49,10 @@ def scrape_table(url):
     json_data = json.dumps(data, indent=4)
     
     # Save to JSON file
-    with open('player_stats.json', 'w') as json_file:
+    with open('team_stats.json', 'w') as json_file:
         json_file.write(json_data)
     
-    print("Data saved to player_stats.json")
+    
     return json_data
 
-# Przykładowe użycie
-url = "https://hashtagbasketball.com/nba-defense-vs-position"  # Podmień na prawdziwy URL
-stats_headers, stats_rows = scrape_player_stats(url)
 
-if stats_rows:
-    print(f'Print stats headers{stats_headers}')
-    for row in stats_rows:
-        print(f'Print rows: {row}')
-
-json_output = scrape_table(url)
-
-if json_output:
-    print(json_output)

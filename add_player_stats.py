@@ -2,6 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+nba_positions = {
+    "Point Guard": "PG",
+    "Shooting Guard": "SG",
+    "Small Forward": "SF",
+    "Power Forward": "PF",
+    "Center": "C"
+}
+
 def scrape_player_stats(url):
     response = requests.get(url)
 
