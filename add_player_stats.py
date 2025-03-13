@@ -2,13 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-nba_positions = {
-    "Point Guard": "PG",
-    "Shooting Guard": "SG",
-    "Small Forward": "SF",
-    "Power Forward": "PF",
-    "Center": "C"
-}
+
 
 def scrape_player_stats(url):
     response = requests.get(url)
@@ -105,3 +99,5 @@ def scrape_player_name(url):
     else:
         print("Nie znaleziono imienia i nazwiska gracza")
         return None  # Zwróć None, jeśli imię i nazwisko nie zostały znalezione
+
+ 

@@ -9,6 +9,7 @@ import json
 
 
 def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):
+    print(f"scrape_table function started")
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -45,14 +46,11 @@ def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):
             if player_data:
                 data.append(player_data)
 
-    # Convert to JSON format
-    json_data = json.dumps(data, indent=4)
+    # Save to CSV file
+    print(f"Zapisywanie do DF i CSV")
+    df = pd.DataFrame(data)  # Convert data to DataFrame
+    df.to_csv('team_stats.csv', index=False)  # Save DataFrame to CSV
     
-    # Save to JSON file
-    with open('team_stats.json', 'w') as json_file:
-        json_file.write(json_data)
-    
-    
-    return json_data
+    return df  # Return the DataFrame
 
 

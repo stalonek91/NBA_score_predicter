@@ -91,9 +91,9 @@ with st.form(key='scrape_form'):
 
 if submit_scrape_button:
     # Wywołanie funkcji scrape_table tylko po naciśnięciu przycisku
-    # scrape_table()  # Wywołanie funkcji scrape_table
-    print(f"SUBMIT KURWA")
+    scrape_table()  # Wywołanie funkcji scrape_table
+    print(f"SUBMIT Scrape_button")
     st.success("Funkcja scrape_table została wywołana.")
     
     # Nowe wywołanie upload_file_to_digital_ocean
-    upload_file_to_digital_ocean('team_stats.json', BUCKET_NAME, 'team_stats.json')  # Przesyłanie pliku JSON
+    upload_file_to_digital_ocean('team_stats.csv', BUCKET_NAME, 'team_stats.csv')  # Przesyłanie pliku CSV
