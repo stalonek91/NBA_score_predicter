@@ -23,6 +23,7 @@ def scrape_player_stats(url):
     print("Znaleziono tabelę")
 
     headers = [th.text.strip() for th in table.find('thead').find_all('th')]
+    print(f"Nagłówki: {headers}")  # Print the headers
 
     rows = []
     tbody = table.find('tbody')
@@ -30,7 +31,7 @@ def scrape_player_stats(url):
         last_date = None  # Variable to store the last date
         for tr in tbody.find_all('tr'):
             tds = tr.find_all('td')
-            print([td.text.strip() for td in tds])  # Print all column values for debugging
+            print(f"Row data: {[td.text.strip() for td in tds]}")  # Print each row's data
             
             # Check if the expected Date column has a value
             if len(tds) > 0 and tds[1].text.strip():  # Adjust index if necessary
@@ -70,8 +71,14 @@ def scrape_player_stats(url):
     # Tworzenie DataFrame
     df = pd.DataFrame(rows, columns=headers)
 
+    # Print the entire DataFrame before removing duplicates
+    print(f"DataFrame przed usunięciem zduplikowanych kolumn:\n{df}")
+
     # Usunięcie zduplikowanych kolumn
     df = df.loc[:, ~df.columns.duplicated()]
+
+    # Print the final DataFrame
+    print(f"DataFrame po usunięciu zduplikowanych kolumn:\n{df}")
 
     return df  # Zwróć DataFrame
 

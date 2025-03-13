@@ -20,14 +20,18 @@ def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):
     soup = BeautifulSoup(response.text, 'html.parser')
     
     # Target the specific table by its ID
-    table = soup.find('table', id='ContentPlaceHolder1_GridView1')  # Use the ID to target the correct table
+    table = soup.find('table', id='ContentPlaceHolder1_GridView2')  # Use the ID to target the correct table
     
     if not table:
         print("Table not found on the page.")
         return None
     
+    # Print the HTML of the table for debugging
+    print(f"Table HTML: {table.prettify()}")  # Print the entire table HTML
+
     # Extract headers
     headers = [th.text.strip() for th in table.find_all('th')]
+    print(f"Extracted headers: {headers}")  # Print all extracted headers
     
     data = []
     
@@ -38,11 +42,15 @@ def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):
         cols = row.find_all('td')
         if cols:  # Ensure there are columns in the row
             player_data = {}
-            for i, col in enumerate(cols):
-                spans = col.find_all('span')
+            # Include the first column (position)
+            player_data[headers[0]] = cols[0].text.strip()  # Add player position
+            
+            for i in range(1, len(cols)):  # Start from the second column
+                spans = cols[i].find_all('span')
                 if spans:
-                    # Extract text from spans
                     player_data[headers[i]] = [span.text.strip() for span in spans]
+                    print(f"Column '{headers[i]}': {player_data[headers[i]]}")  # Print each column's data
+            
             if player_data:
                 data.append(player_data)
 
@@ -51,6 +59,9 @@ def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):
     df = pd.DataFrame(data)  # Convert data to DataFrame
     df.to_csv('team_stats.csv', index=False)  # Save DataFrame to CSV
     
+
+
+    print(df.head(10))
     return df  # Return the DataFrame
 
 
