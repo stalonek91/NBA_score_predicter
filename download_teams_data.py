@@ -19,12 +19,14 @@ def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):
     
     soup = BeautifulSoup(response.text, 'html.parser')
     
-    # Target the specific table by its ID
-    table = soup.find('table', id='ContentPlaceHolder1_GridView2')  # Use the ID to target the correct table
-    
-    if not table:
-        print("Table not found on the page.")
+    # Find all tables on the page
+    tables = soup.find_all('table')  # Get all tables
+    if not tables:
+        print("No tables found on the page.")
         return None
+    
+    # Target the last table
+    table = tables[-1]  # Get the last table
     
     # Print the HTML of the table for debugging
     print(f"Table HTML: {table.prettify()}")  # Print the entire table HTML
@@ -55,12 +57,10 @@ def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):
                 data.append(player_data)
 
     # Save to CSV file
-    print(f"Zapisywanie do DF i CSV")
+    print(f"Saving to DF and CSV")
     df = pd.DataFrame(data)  # Convert data to DataFrame
     df.to_csv('team_stats.csv', index=False)  # Save DataFrame to CSV
     
-
-
     print(df.head(10))
     return df  # Return the DataFrame
 
