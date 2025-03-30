@@ -11,76 +11,53 @@ def scrape_player_stats(url):
         print("Pobrano stronę pomyślnie")
     else:
         print(f"Błąd: {response.status_code}")
-        return None  # Zwróć None w przypadku błędu
+        return None
 
     soup = BeautifulSoup(response.text, 'html.parser')
-    table = soup.find('table', {'class': 'stats_table'})  # Upewnij się, że klasa jest poprawna
+    table = soup.find('table', {'class': 'stats_table'})
 
     if table is None:
         print("Nie znaleziono tabeli z danymi")
-        return None  # Zwróć None, jeśli tabela nie została znaleziona
+        return None
 
     print("Znaleziono tabelę")
 
     headers = [th.text.strip() for th in table.find('thead').find_all('th')]
-    print(f"Nagłówki: {headers}")  # Print the headers
+    print(f"Nagłówki: {headers}")
 
     rows = []
     tbody = table.find('tbody')
     if tbody:
-        last_date = None  # Variable to store the last date
         for tr in tbody.find_all('tr'):
             tds = tr.find_all('td')
-            print(f"Row data: {[td.text.strip() for td in tds]}")  # Print each row's data
+            print(f"Row data: {[td.text.strip() for td in tds]}")
             
             # Check if the expected Date column has a value
-            if len(tds) > 0 and tds[1].text.strip():  # Adjust index if necessary
-                current_date = tds[1].text.strip()  # Get the date from the correct column
+            if len(tds) > 0 and tds[1].text.strip():
+                current_date = tds[1].text.strip()
                 print(f"Aktualna data to: {current_date}")
-                # If last_date is not None, check if the current date is earlier than the last
-                if last_date is not None and (current_date < last_date):
-                    break  # Stop if the current date is earlier than the last
-                
-                # Update last_date
-                last_date = current_date
                 
                 # Check if the number of <td> matches the number of headers
-                if len(tds) == len(headers) - 1:  # Match to 29
+                if len(tds) == len(headers) - 1:
                     row = [td.text.strip() for td in tds]
-                    row.insert(0, '')  # Add an empty element at the start
+                    row.insert(0, '')
                     rows.append(row)
-                elif len(tds) == len(headers):  # Match to 30
+                elif len(tds) == len(headers):
                     row = [td.text.strip() for td in tds]
                     rows.append(row)
     else:
         print("Nie znaleziono <tbody>")
-        return None  # Zwróć None, jeśli <tbody> nie zostało znalezione
-
-    # Sprawdź, czy są inne sekcje tabeli
-    for tr in table.find_all('tr'):
-        tds = tr.find_all('td')
-        if len(tds) > 0 and len(tds) != len(headers):  # Ignoruj nagłówki
-            current_date = tds[1].text.strip()  # Pobierz datę z odpowiedniej kolumny
-            if last_date is not None and (current_date < last_date):
-                break  # Przerwij, jeśli napotkano datę wcześniejszą niż last_date
-            row = [td.text.strip() for td in tds]
-            if len(row) == len(headers) - 1:
-                row.insert(0, '')  # Dodaj pusty element na początek
-            rows.append(row)
+        return None
 
     # Tworzenie DataFrame
     df = pd.DataFrame(rows, columns=headers)
-
-    # Print the entire DataFrame before removing duplicates
     print(f"DataFrame przed usunięciem zduplikowanych kolumn:\n{df}")
 
     # Usunięcie zduplikowanych kolumn
     df = df.loc[:, ~df.columns.duplicated()]
-
-    # Print the final DataFrame
     print(f"DataFrame po usunięciu zduplikowanych kolumn:\n{df}")
 
-    return df  # Zwróć DataFrame
+    return df
 
 def scrape_player_name(url):
     response = requests.get(url)
