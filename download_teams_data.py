@@ -1,11 +1,18 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import pandas as pd
+from webdriver_manager.chrome import ChromeDriverManager
 import requests
-import json
+from io import StringIO
+import time
+import logging
+import random
+import os
 
 
 def scrape_table(url="https://hashtagbasketball.com/nba-defense-vs-position"):

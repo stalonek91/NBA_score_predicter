@@ -5,3 +5,6 @@ __pycache__/
 player_stats.json
 raw_page.html
 raw_page_files/
+.DS_Store
+.ipynb_checkpoints/
+.vscode/

@@ -24,9 +24,23 @@ def start_boto3_session():
 
 def upload_file_to_digital_ocean(file_name, bucket_name, object_name):
     s3 = start_boto3_session()  # Uzyskujemy klienta S3
+    
     try:
-        s3.upload_file(file_name, bucket_name, object_name)  # Przesyłamy plik
-        st.success(f"Plik {file_name} został pomyślnie przesłany do {bucket_name}.")
+        # Extract folder name from file name
+        if "2024-25.csv" in object_name:
+            # Remove the year and .csv extension
+            folder_name = object_name.replace(" 2024-25.csv", "")
+            # Replace spaces with underscores
+            folder_name = folder_name.replace(" ", "_")
+            # Create the new object path with folder
+            object_path = f"{folder_name}/{object_name}"
+        else:
+            # If file doesn't contain year, use Team_stats folder
+            folder_name = "Team_stats"
+            object_path = f"{folder_name}/{object_name}"
+
+        s3.upload_file(file_name, bucket_name, object_path)  # Przesyłamy plik
+        st.success(f"Plik {file_name} został pomyślnie przesłany do folderu {folder_name} w buckecie {bucket_name}.")
     except Exception as e:
         st.error(f"Wystąpił błąd podczas przesyłania pliku: {e}")
 
@@ -82,7 +96,7 @@ if st.button("Zapisz w digital_ocean"):
             f.write(uploaded_file.getbuffer())
         
         upload_file_to_digital_ocean(temp_file_path, BUCKET_NAME, uploaded_file.name)  # Wywołanie funkcji przesyłającej
-    else:
+    else:    
         st.error("Proszę wybrać plik CSV do przesłania.")
 
 # Nowa forma do wywołania funkcji scrape_table
